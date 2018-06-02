@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BattleShips 2.0 - Venha para esta aventura :3 </title>
+    <link rel="stylesheet" type="text/css" href="BattleStyle.css">
+</head>
+<body>
+<div class = "container" id="user"></div>
+
+<div class = "container" id="computer"></div>
+<button id="start" onclick = "startGame(event)">Comecar</button>
+<button id="restart" style="display: none" onclick="cleanup()">Reiniciar</button>
+</body>
+<script src="/socket.io/socket.io.js"></script>
+<script src="BattleScript.js">
+</script>
+</html>
