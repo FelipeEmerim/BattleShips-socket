@@ -114,40 +114,45 @@ io.on('connection', function(socket){ //cria uma sessão para um cliente que se 
 
     socket.on('user-shot', function(data){ //evento que valida o tiro do usuario,
         //recebe coordenadas e id do elemento através de JSON
-        switch(cpuCampo[data.s_line][data.s_column]){
-            case 0: //tiro na água
+        if(data && data.s_line && data.s_column && cpuCampo) {
 
-                cpuCampo[data.s_line][data.s_column] = 2; //seta celula para tiro na água
-                socket.emit('player-water-shot', {id: data.id}); //emite tiro na água para o cliente
-                break;
+            switch (cpuCampo[data.s_line][data.s_column]) {
+                case 0: //tiro na água
 
-            case 1: //tiro em barco
-                cpuCampo[data.s_line][data.s_column] = 3; //seta céula para tiro em barco
-                hits++; //aumenta o contador de acertos do cliente
-                socket.emit('player-boat-shot', {id:data.id}); //emite tiro em barco para o cliente
-                break;
+                    cpuCampo[data.s_line][data.s_column] = 2; //seta celula para tiro na água
+                    socket.emit('player-water-shot', {id: data.id}); //emite tiro na água para o cliente
+                    break;
 
-            default: //tiro inválido
-                socket.emit('wasted-shot'); //emite evento de tiro inválido para o cliente
+                case 1: //tiro em barco
+                    cpuCampo[data.s_line][data.s_column] = 3; //seta céula para tiro em barco
+                    hits++; //aumenta o contador de acertos do cliente
+                    socket.emit('player-boat-shot', {id: data.id}); //emite tiro em barco para o cliente
+                    break;
+
+                default: //tiro inválido
+                    socket.emit('wasted-shot'); //emite evento de tiro inválido para o cliente
+            }
         }
     });
 
     socket.on('cpu-shot', function (data) { //evento que controla o tiro da cpu
 //recebe um JSON com as coordenadas do tiro e a id da celula
 
-        switch (campo[data.s_line][data.s_column]){
-            case 0://tiro na água
-                campo[data.s_line][data.s_column] = 2; //seta celula para tiro na agua
-                socket.emit('cpu-water-shot', {id:data.id}); //emite evento de tiro na agua para o cliente
-                break;
-            case 1: //tiro em barco
-                campo[data.s_line][data.s_column] = 3; //seta celula para tiro em barco
-                cpuHits++; //aumenta o contador de acertos para a cpu
-                socket.emit('cpu-boat-shot', {id:data.id}); //emite evento de tiro em barco para o cliente
-                break;
-            default: //tiro inválido
-                socket.emit('cpu-fail'); //emite evento de tiro inválido para o cliente
-                break;
+        if(data && data.s_line && data.s_column && cpuCampo) {
+            switch (campo[data.s_line][data.s_column]) {
+                case 0://tiro na água
+                    campo[data.s_line][data.s_column] = 2; //seta celula para tiro na agua
+                    socket.emit('cpu-water-shot', {id: data.id}); //emite evento de tiro na agua para o cliente
+                    break;
+                case 1: //tiro em barco
+                    campo[data.s_line][data.s_column] = 3; //seta celula para tiro em barco
+                    cpuHits++; //aumenta o contador de acertos para a cpu
+                    socket.emit('cpu-boat-shot', {id: data.id}); //emite evento de tiro em barco para o cliente
+                    break;
+                default: //tiro inválido
+                    socket.emit('cpu-fail'); //emite evento de tiro inválido para o cliente
+                    break;
+            }
         }
     }); //nos dois eventos de tiro SEMPRE é emitido a id do elemento para alterar ao cliente em caso de tiro válido
 
