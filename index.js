@@ -2,7 +2,7 @@
 
 //Para recuperar os elementos usar as posições de 0 a 9
 // matriz para controlar o que já foi destruído
-// 0 para célula intácta
+// 0 para célula intacta
 // 1 para barco
 // 2 para tiro na água
 // 3 tiro em um barco
@@ -124,7 +124,7 @@ io.on('connection', function(socket){ //cria uma sessão para um cliente que se 
                     break;
 
                 case 1: //tiro em barco
-                    cpuCampo[data.s_line][data.s_column] = 3; //seta céula para tiro em barco
+                    cpuCampo[data.s_line][data.s_column] = 3; //seta célula para tiro em barco
                     hits++; //aumenta o contador de acertos do cliente
                     socket.emit('player-boat-shot', {id: data.id}); //emite tiro em barco para o cliente
                     break;
