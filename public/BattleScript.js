@@ -31,11 +31,6 @@ function cleanup(){ //função que inicializa o jogp
     cpu.className = 'container';
     cpu.style.pointerEvents = 'none'; //desativa eventos do campo da cpu
 
-    myAudio.currentTime = 0;
-    defeatAudio.pause();
-    victoryAudio.pause();
-    myAudio.play(); //toca música de fundo
-
     socket.emit("cleanup"); //envia evento de inicializar o jogo ao servidor
 
     socket.emit("cpu-boats");  //envia evento de posicionar barcos da cpu ao servidor
@@ -68,7 +63,12 @@ function cleanup(){ //função que inicializa o jogp
     document.getElementById('restart').style.display = 'none'; //esconde o botão de reiniciar o jogo
 }
 
-function startGame(event){ //função disparada
+function startGame(event){ //função disparada pelo html
+
+    myAudio.currentTime = 0;
+    defeatAudio.pause();
+    victoryAudio.pause();
+    myAudio.play(); //toca música de fundo
 
     cpu.style.pointerEvents = 'auto'; //ativa eventos no campo da cpu
     requestUserBoats(); //chama a função de pedir barcos do usuário
