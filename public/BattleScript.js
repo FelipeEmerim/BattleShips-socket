@@ -3,7 +3,13 @@
 const myAudio = new Audio('background.mp3'); //inicializa variável de música do jogo
 myAudio.volume = 0.4; //deixa um volume suportável na música de fundo
 myAudio.loop = true; //configura o som para tocar em loop
-myAudio.play(); //toca música de fundo
+
+const victoryAudio = new Audio('victory.mp3'); //inicializa variável de música do jogo
+victoryAudio.volume = 1; //deixa um volume suportável na música de fundo
+
+const defeatAudio = new Audio('defeat.mp3'); //inicializa variável de música do jogo
+defeatAudio.volume = 1; //deixa um volume suportável na música de fundo
+
 const container = document.getElementById("user"); //recupera o campo do usuário
 const cpu = document.getElementById("computer");  //recupera o campo da cpu
 const socket = io();  //inicializa o socket io no lado do cliente, isto foi importado no html
@@ -25,7 +31,10 @@ function cleanup(){ //função que inicializa o jogp
     cpu.className = 'container';
     cpu.style.pointerEvents = 'none'; //desativa eventos do campo da cpu
 
-
+    myAudio.currentTime = 0;
+    defeatAudio.pause();
+    victoryAudio.pause();
+    myAudio.play(); //toca música de fundo
 
     socket.emit("cleanup"); //envia evento de inicializar o jogo ao servidor
 
@@ -70,6 +79,7 @@ function startGame(event){ //função disparada
 function setUserBoat(e){ //função que envia os dados de um barco do usuário a ser colocado ao servidor
     let line = e.target.dataset.line; //recupera a coordenada da linha
     let column = e.target.dataset.column;  //recupera a coordenada da coluna
+    let target = e.target;
 
     socket.emit('set-boat', {s_line:line, s_column:column, id:target.id}); //envia evento de colocar barco ao servidor
     //envia um JSON com as coordenadas e a id do elemento ao servidor
@@ -121,12 +131,20 @@ function shot(event) { //função que controla os tiros realizados
 }
 
 socket.on('player-win', function () { //evento que controla a vitoria do usuário
+    myAudio.pause();
+    victoryAudio.currentTime = 0;
+    victoryAudio.play();
+
     window.alert("Você venceu"); //informa o usuário de sua vitória
     container.style.pointerEvents = "none"; //desativa eventos do campo do usuário
     document.getElementById('restart').style.display = 'block'; //mostra o botão de recomeçar o jogo
 });
 
 socket.on('cpu-win', function () { //evento que controla a vitoria da cpu
+    myAudio.pause();
+    defeatAudio.currentTime = 0;
+    defeatAudio.play();
+
     window.alert("Você perdeu"); //informa o usuário de sua derrota
     container.style.pointerEvents = "none"; //desativa eventos do campo do usuário
     document.getElementById('restart').style.display = 'block'; //mostra o botão de recomeçar o jogo
