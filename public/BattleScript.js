@@ -65,6 +65,7 @@ function cleanup(){ //função que inicializa o jogp
 
 function startGame(event){ //função disparada pelo html
 
+    //audio must start here because of chrome's autoplay policy
     myAudio.currentTime = 0;
     defeatAudio.pause();
     victoryAudio.pause();
