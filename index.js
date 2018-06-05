@@ -23,7 +23,7 @@ app.get('/', function(req,res) { //método que acontece quando cliente acessa a 
 });
 
 
-app.all('/*',function(req,res){
+app.all('/*', function(req,res){
     res.redirect('/'); //redireciona para raiz em caso de qualquer outra rota
 
 });
@@ -36,28 +36,25 @@ função emit(), para isto gerar resultado, o listener do evento emitido precisa
 io.on('connection', function(socket){ //cria uma sessão para um cliente que se conecta
     console.log(socket.request.client._peername.address+" connected"); //informa na console
     //inicializa variáveis globais ao cliente
-    let campo = [], cpuCampo = [];
-    let hits, cpuHits;
-    let cpuBoats = 9, userBoats = 9;
-    const BOATS = 9;
 
     function randomBoat(){ //função que gera um barco aleatório com 5% de chance
-        if(cpuBoats === 0) return 0;
+        if(socket['cpuBoats'] === 0) return 0;
 
         let rand = Math.random();
 
         if(rand > 0.95){
-            cpuBoats--;
+            socket['cpuBoats']--;
             return 1;
         }else return 0;
     }
 
     socket.on('cleanup', function () { //evento que inicializa as variaveis antes de o jogo começar
-        hits = 0;
-        cpuHits = 0;
-        cpuBoats = 9;
-        userBoats = 9;
-        cpuCampo = [
+        socket['hits'] = 0;
+        socket['cpuHits'] = 0;
+        socket['cpuBoats'] = 9;
+        socket['userBoats'] = 9;
+        socket['BOATS'] = 9;
+        socket['cpuCampo'] = [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -72,18 +69,18 @@ io.on('connection', function(socket){ //cria uma sessão para um cliente que se 
     });
 
     socket.on('cpu-boats', function(){ //força a cpu a posicionar 9 barcos aleatoriamente
-        while(cpuBoats > 0) {
+        while(socket['cpuBoats'] > 0) {
             for (let i = 0; i < 10; i++) {
                 for (let j = 0; j < 10; j++) {
 
-                    if (cpuCampo[i][j] !== 1) cpuCampo[i][j] = randomBoat();
+                    if (socket['cpuCampo'][i][j] !== 1) socket['cpuCampo'][i][j] = randomBoat();
                 }
             }
         }
     });
 
     socket.on('initialize-user', function(){ //evento que reseta o campo do usuário
-        campo = [
+        socket['campo'] = [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -99,70 +96,68 @@ io.on('connection', function(socket){ //cria uma sessão para um cliente que se 
 
     socket.on('set-boat', function(data){ //evento que posiciona um barco do usuário, recebe as coordenadas em um JSON
 
-       if(campo[data.s_line][data.s_column] === 0){ //posição válida
-           campo[data.s_line][data.s_column] = 1;
+       if(socket['campo'][data.s_line][data.s_column] === 0){ //posição válida
+           socket['campo'][data.s_line][data.s_column] = 1;
            socket.emit('put-boat', {id:data.id}); //envia o id do elemento através de um JSON para o cliente
-           userBoats--; //diminui contador de barcos a posicionar
+           socket['userBoats']--; //diminui contador de barcos a posicionar
        }else{
            socket.emit('stack-boat'); //emite evento de posição inválida
        }
 
-       if(userBoats === 0){ //quando todos os barcos estiverem posicionados
+       if(socket['userBoats'] === 0){ //quando todos os barcos estiverem posicionados
            socket.emit('game-start') //emite evento de começar o jogo
        }
     });
 
     socket.on('user-shot', function(data){ //evento que valida o tiro do usuario,
         //recebe coordenadas e id do elemento através de JSON
-        if(data && data.s_line && data.s_column && cpuCampo) {
 
-            switch (cpuCampo[data.s_line][data.s_column]) {
-                case 0: //tiro na água
 
-                    cpuCampo[data.s_line][data.s_column] = 2; //seta celula para tiro na água
-                    socket.emit('player-water-shot', {id: data.id}); //emite tiro na água para o cliente
-                    break;
+        switch (socket['cpuCampo'][data.s_line][data.s_column]) {
+            case 0: //tiro na água
 
-                case 1: //tiro em barco
-                    cpuCampo[data.s_line][data.s_column] = 3; //seta célula para tiro em barco
-                    hits++; //aumenta o contador de acertos do cliente
-                    socket.emit('player-boat-shot', {id: data.id}); //emite tiro em barco para o cliente
-                    break;
+                socket['cpuCampo'][data.s_line][data.s_column] = 2; //seta celula para tiro na água
+                socket.emit('player-water-shot', {id: data.id}); //emite tiro na água para o cliente
+                break;
 
-                default: //tiro inválido
-                    socket.emit('wasted-shot'); //emite evento de tiro inválido para o cliente
-            }
+            case 1: //tiro em barco
+                socket['cpuCampo'][data.s_line][data.s_column] = 3; //seta célula para tiro em barco
+                socket['hits']++; //aumenta o contador de acertos do cliente
+                socket.emit('player-boat-shot', {id: data.id}); //emite tiro em barco para o cliente
+                break;
+
+            default: //tiro inválido
+                socket.emit('wasted-shot'); //emite evento de tiro inválido para o cliente
         }
     });
 
     socket.on('cpu-shot', function (data) { //evento que controla o tiro da cpu
 //recebe um JSON com as coordenadas do tiro e a id da celula
 
-        if(data && data.s_line && data.s_column && cpuCampo) {
-            switch (campo[data.s_line][data.s_column]) {
-                case 0://tiro na água
-                    campo[data.s_line][data.s_column] = 2; //seta celula para tiro na agua
-                    socket.emit('cpu-water-shot', {id: data.id}); //emite evento de tiro na agua para o cliente
-                    break;
-                case 1: //tiro em barco
-                    campo[data.s_line][data.s_column] = 3; //seta celula para tiro em barco
-                    cpuHits++; //aumenta o contador de acertos para a cpu
-                    socket.emit('cpu-boat-shot', {id: data.id}); //emite evento de tiro em barco para o cliente
-                    break;
-                default: //tiro inválido
-                    socket.emit('cpu-fail'); //emite evento de tiro inválido para o cliente
-                    break;
-            }
+        switch (socket['campo'][data.s_line][data.s_column]) {
+            case 0://tiro na água
+                socket['campo'][data.s_line][data.s_column] = 2; //seta celula para tiro na agua
+                socket.emit('cpu-water-shot', {id: data.id}); //emite evento de tiro na agua para o cliente
+                break;
+            case 1: //tiro em barco
+                socket['campo'][data.s_line][data.s_column] = 3; //seta celula para tiro em barco
+                socket['cpuHits']++; //aumenta o contador de acertos para a cpu
+                socket.emit('cpu-boat-shot', {id: data.id}); //emite evento de tiro em barco para o cliente
+                break;
+            default: //tiro inválido
+                socket.emit('cpu-fail'); //emite evento de tiro inválido para o cliente
+                break;
         }
+
     }); //nos dois eventos de tiro SEMPRE é emitido a id do elemento para alterar ao cliente em caso de tiro válido
 
     socket.on('game-state', function () { //evento que verifica o estado de jogo
 
-        if (hits === BOATS){ //se cliente venceu
+        if (socket['hits'] === socket['BOATS']){ //se cliente venceu
 
             socket.emit('player-win'); //emite evento de vitória do cliente ao cliente
 
-        }else if(cpuHits === BOATS){ //se cpu venceu
+        }else if(socket['cpuHits'] === socket['BOATS']){ //se cpu venceu
             socket.emit('cpu-win'); //emite evento de vitória da cpu ao cliente
         }
     });
@@ -171,7 +166,6 @@ io.on('connection', function(socket){ //cria uma sessão para um cliente que se 
         console.log(socket.request.client._peername.address+" disconnected") //imprime na console
     })
 });
-
 
 http.listen(3000, () => console.log('BattleShips server online at ip '+ip.address()+' port 3000!'));
 //define porta em que o servidor vai ouvir e o inicializa, printa na console o ip do servidor e sua porta

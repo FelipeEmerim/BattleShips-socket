@@ -12,7 +12,7 @@ defeatAudio.volume = 1; //deixa um volume suportável na música de fundo
 
 const container = document.getElementById("user"); //recupera o campo do usuário
 const cpu = document.getElementById("computer");  //recupera o campo da cpu
-const socket = io();  //inicializa o socket io no lado do cliente, isto foi importado no html
+const socket = io.connect();  //inicializa o socket io no lado do cliente, isto foi importado no html
 container.style.pointerEvents = "none"; //desativa eventos no campo do usuário
 
 cleanup(); //roda função de inicializar o jogo
@@ -130,6 +130,9 @@ function shot(event) { //função que controla os tiros realizados
     play(event); //chama a função de tiro do usuário
     socket.emit('game-state'); //verifica se há um vencedor
 }
+socket.on('refresh-page', function () {
+    location.reload();
+});
 
 socket.on('player-win', function () { //evento que controla a vitoria do usuário
     myAudio.pause();
@@ -210,3 +213,8 @@ socket.on('wasted-shot', function () { //evento que controla tiro inválido do u
     window.alert("Pare de desperdiçar torpedos soldado"); //informa o usuário do tiro inválido
     //não chama tiro da cpu para possibilitar o usuário tentar seu tiro novamente
 });
+
+socket.on('reconnect', function () {
+    socket.restoreContext();
+});
+
