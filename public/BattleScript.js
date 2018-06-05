@@ -214,7 +214,7 @@ socket.on('wasted-shot', function () { //evento que controla tiro inválido do u
     //não chama tiro da cpu para possibilitar o usuário tentar seu tiro novamente
 });
 
-socket.on('reconnect', function () {
+socket.on('reconnect', function () { //restaura a conexão do cliente, não funciona em mobile por motivos desconhecidos
     socket.restoreContext();
 });
 
