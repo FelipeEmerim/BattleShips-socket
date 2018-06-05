@@ -130,6 +130,7 @@ function shot(event) { //função que controla os tiros realizados
     play(event); //chama a função de tiro do usuário
     socket.emit('game-state'); //verifica se há um vencedor
 }
+
 socket.on('refresh-page', function () {
     location.reload();
 });
@@ -213,8 +214,3 @@ socket.on('wasted-shot', function () { //evento que controla tiro inválido do u
     window.alert("Pare de desperdiçar torpedos soldado"); //informa o usuário do tiro inválido
     //não chama tiro da cpu para possibilitar o usuário tentar seu tiro novamente
 });
-
-socket.on('reconnect', function () { //restaura a conexão do cliente, não funciona em mobile por motivos desconhecidos
-    socket.restoreContext();
-});
-
