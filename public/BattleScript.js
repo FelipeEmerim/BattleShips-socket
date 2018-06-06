@@ -23,7 +23,7 @@ parametro da função on, isto configura um listener, ou seja, quem vai ouvir o 
 função emit(), para isto gerar resultado, o listener do evento emitido precisa existir
  */
 
-function cleanup(){ //função que inicializa o jogp
+function cleanup(){    //função que inicializa o jogp
     container.innerHTML = ''; //limpa o campo do cliente
     cpu.innerHTML = '';  //limpa o campo da cpu
 
