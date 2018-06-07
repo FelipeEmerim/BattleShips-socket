@@ -12,7 +12,7 @@ defeatAudio.volume = 1; //deixa um volume suportável na música de fundo
 
 const container = document.getElementById("user"); //recupera o campo do usuário
 const cpu = document.getElementById("computer");  //recupera o campo da cpu
-const socket = io.connect();  //inicializa o socket io no lado do cliente, isto foi importado no html
+const socket = io();  //inicializa o socket io no lado do cliente, isto foi importado no html
 container.style.pointerEvents = "none"; //desativa eventos no campo do usuário
 
 cleanup(); //roda função de inicializar o jogo

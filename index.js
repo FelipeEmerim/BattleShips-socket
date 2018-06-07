@@ -152,7 +152,7 @@ io.on('connection', function(socket){ //cria uma sessão para um cliente que se 
             switch (socket['campo'][data.s_line][data.s_column]) {
                 case 0://tiro na água
                     socket['campo'][data.s_line][data.s_column] = 2;   //seta celula para tiro na agua
-                    socket.emit('cpu-water-shot', {id: data.id});   //emite evento de tiro na agua para o cliente
+                    socket.emit('cpu-water-shot', {id: data.id});                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            //emite evento de tiro na agua para o cliente
                     break;
                 case 1: //tiro em barco
                     socket['campo'][data.s_line][data.s_column] = 3; //seta celula para tiro em barco
