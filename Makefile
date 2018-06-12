@@ -8,7 +8,6 @@ update: package.json
 	sudo npm install
 
 server: index.js
-	firefox localhost:3000/ & disown
 	node index.js
 
 clean:
