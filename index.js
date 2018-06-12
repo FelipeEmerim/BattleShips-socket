@@ -118,7 +118,7 @@ io.on('connection', function(socket){ //cria uma sessão para um cliente que se 
     socket.on('user-shot', function(data){ //evento que valida o tiro do usuario,
         //recebe coordenadas e id do elemento através de JSON
         if(typeof(socket['campo']) ==="undefined"){
-            socket.emit('refresh-page');
+            socket.emit('refresh-page'); // caso perca a conexão
         }
         else {
 
